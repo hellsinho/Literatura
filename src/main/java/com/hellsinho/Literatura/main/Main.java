@@ -1,12 +1,18 @@
 package com.hellsinho.Literatura.main;
 
+import com.hellsinho.Literatura.model.DadosLivro;
+import com.hellsinho.Literatura.model.Livro;
+import com.hellsinho.Literatura.model.Response;
 import com.hellsinho.Literatura.service.ConsumoApi;
+import com.hellsinho.Literatura.service.ConverterDados;
 
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class Main {
     private Scanner leitura = new Scanner(System.in);
     private ConsumoApi consome = new ConsumoApi();
+    private ConverterDados conversor = new ConverterDados();
     public void menu(){
         System.out.println("""
                 --------------------------------------------
@@ -51,7 +57,22 @@ public class Main {
     }
 
     private void buscarLivroPeloTitulo() {
+        Response dadosLivro = getDadosLivro();
 
+        Livro livro = new Livro(dadosLivro.results().get(0));
+        System.out.println(livro);
+
+//        System.out.println(dadosLivro.results().get(0));
+
+    }
+
+    private Response getDadosLivro(){
+        System.out.println("Digite o nome do livro: ");
+        var nomeLivro = leitura.nextLine();
+
+        var json = consome.obterDados("http://gutendex.com/books/?search=" + nomeLivro.replace(" ", "+").toLowerCase());
+        Response dados = conversor.obterDados(json, Response.class);
+        return dados;
     }
 
     private void listarLivrosRegistrados() {
